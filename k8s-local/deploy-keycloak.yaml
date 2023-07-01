@@ -36,9 +36,9 @@ metadata:
 spec:
   ports:
   - name: http
-    port: 80
+    port: 8080
     targetPort: 8080
-    #nodePort: 30001
+    nodePort: 30001
   selector:
     app: keycloak
-  type: LoadBalancer
+  type: NodePort
