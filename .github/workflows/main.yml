@@ -21,7 +21,7 @@ jobs:
           file: ./chatservice/Dockerfile
           push: true
           tags: |
-            c410l/imersao-chatservice:v1
+            c410l/imersao-chatservice:${{ github.run_number }}
             c410l/imersao-chatservice:latest
       - name: Docker build webapp
         uses: docker/build-push-action@v4.1.1
@@ -30,7 +30,8 @@ jobs:
           file: ./webapp/Dockerfile
           push: true
           tags: |
-            c410l/imersao-gpt-webapp:v1
+            c410l/imersao-gpt-webapp:${{ github.run_number }}
+            c410l/imersao-gpt-webapp:${{ steps.metadata.outputs.tags }}
             c410l/imersao-gpt-webapp:latest
   CD:
     runs-on: ubuntu-latest
