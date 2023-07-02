@@ -23,7 +23,7 @@ jobs:
           file: ./chatservice/Dockerfile
           push: true
           tags: |
-            c410l/imersao-chatservice:${{ github.run_number }}
+            c410l/imersao-chatservice:v${{ github.run_number }}
             c410l/imersao-chatservice:latest
 
       - name: Docker build webapp
@@ -33,7 +33,7 @@ jobs:
           file: ./webapp/Dockerfile
           push: true
           tags: |
-            c410l/imersao-gpt-webapp:${{ github.run_number }}
+            c410l/imersao-gpt-webapp:v${{ github.sha }}
             c410l/imersao-gpt-webapp:latest
 
   CD:
@@ -47,9 +47,24 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1        
+          aws-region: us-east-1                  
+
+      - name: Configuração do OpenAI API Token
+        shell: bash
+        run: |
+          sed -i "s/{{API_TOKEN}}/${{ secrets.OPENAI_API_KEY }}/g" ./k8s/deploy-chatservice.yaml
 
       - name: Configuração do Kubectl
-        run: echo 'Configurar o kubectl'
+        shell: bash
+        run: \
+          aws eks update-kubeconfig --name eks-imersao --region us-east-1
+
       - name: Deploy das aplicações
-        run: echo 'Executar o comando kubectl apply'
+        uses: Azure/k8s-deploy@v4.9
+        with:
+          manifests: |
+            k8s/deploy-chatservice.yaml
+            k8s/deploy-webapp.yaml
+          images: |
+            c410l/imersao-chatservice:v${{ github.run_number }}
+            c410l/imersao-gpt-webapp:v${{ github.sha }}
