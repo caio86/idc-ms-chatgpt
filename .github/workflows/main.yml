@@ -56,7 +56,7 @@ jobs:
 
       - name: Configuração do Kubectl
         shell: bash
-        run: \
+        run: |
           aws eks update-kubeconfig --name eks-imersao --region us-east-1
 
       - name: Deploy das aplicações
